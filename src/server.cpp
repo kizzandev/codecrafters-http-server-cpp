@@ -113,11 +113,11 @@ int main(int argc, char **argv) {
       isPathFound = false;  // If header is not there, wrong path
       // Find the User-Agent header
       for (const auto line : request_vec) {
-        if (line.find("User-Agent") != std::string::npos) {
+        if (line.starts_with("User-Agent: ")) {
           response = "HTTP/1.1 200 OK\r\n";
           response += "Content-Type: text/plain\r\n";
           response += "Content-Length: ";
-          response += std::to_string(line.size());
+          response += split(line, ": ")[1];
           response += "\r\n\r\n";
           response += line;
           isPathFound = true;
