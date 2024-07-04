@@ -43,8 +43,8 @@ struct Request {
 
 class Server {
  public:
-  Server(int port) : m_port(port){m_server_fd = setup_server()};
-  ~Server(){close(m_server_fd)};
+  Server(int port) : m_port(port) { m_server_fd = setup_server(); };
+  ~Server() { close(m_server_fd); };
 
   void run() {
     while (true) {
