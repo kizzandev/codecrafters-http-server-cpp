@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
       // Find the User-Agent header
       for (std::string line : request_vec) {
         if (line.empty()) break;
-        if (!line.starts_with("User-Agent: ")) continue;
+        if (!line.starts_with("User-Agent")) continue;
 
         std::cout << "Line: " << line << "\n";
         std::cout << "Size: " << line.size() << "\n";
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += split(line, " ")[1].size();
+        response += split(line, ": ")[1].size();
         response += "\r\n\r\n";
         // Body
         response += line;
