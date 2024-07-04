@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   if (request.starts_with("GET")) {
     std::string path = get_path(request);
     std::cout << "Path: " << path << "\n";
-    std::vector<std::string> path_parts = split(path, '/');
+    std::vector<std::string> path_parts = split(path, "/");
     if (path == "/")
       response = "HTTP/1.1 200 OK\r\n\r\n";
     else if (path_parts[1] == "echo") {
