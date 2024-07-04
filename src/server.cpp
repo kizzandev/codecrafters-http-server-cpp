@@ -109,15 +109,21 @@ int main(int argc, char **argv) {
       response += path_parts[2];
     } else if (path_parts[1] == "user-agent") {
       // Must return the User-Agent header
-      // Status
-      response = "HTTP/1.1 200 OK\r\n";
-      // Headers
-      response += "Content-Type: text/plain\r\n";
-      response += "Content-Length: ";
-      response += std::to_string(path_parts[2].size());
-      response += "\r\n\r\n";
-      // Body
-      response += path_parts[2];
+      auto request_vec = split(request, "\r\n");
+      isPathFound = false;  // If header is not there, wrong path
+      // Find the User-Agent header
+      for (const auto line : request_vec) {
+        if (line.find("User-Agent") != std::string::npos) {
+          response = "HTTP/1.1 200 OK\r\n";
+          response += "Content-Type: text/plain\r\n";
+          response += "Content-Length: ";
+          response += std::to_string(line.size());
+          response += "\r\n\r\n";
+          response += line;
+          isPathFound = true;
+          break;
+        }
+      }
     } else {
       isPathFound = false;
     }
