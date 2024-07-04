@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
       response = "HTTP/1.1 200 OK\r\n\r\n";
     else if (path.starts_with("/echo/")) {
       // Status
-      response = "HTTP/1.1 200 OK\r\n\r\n";
+      response = "HTTP/1.1 200 OK\r\n";
       // Headers
       response += "Content-Type: text/plain\r\n";
       response += "Content-Length: ";
