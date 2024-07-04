@@ -22,8 +22,8 @@ std::vector<std::string> split(const std::string &s, const char *delim) {
 }
 
 std::string get_path(std::string &request) {
-  auto req = split(request, "\r\n");
-  return split(req[0], " ")[1];
+  auto req = split(request, "\r\n");  // request + path
+  return split(req[0], " ")[1];       // path
 }
 
 int main(int argc, char **argv) {
@@ -110,6 +110,8 @@ int main(int argc, char **argv) {
     } else {
       isPathFound = false;
     }
+  } else {
+    isPathFound = false;
   }
 
   if (!isPathFound) {
