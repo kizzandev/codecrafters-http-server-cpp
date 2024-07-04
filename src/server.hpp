@@ -159,7 +159,7 @@ class Server {
         response += "Content-Length: 0\r\n\r\n";
       }
     } else if (paths[1] == "files") {
-      if (m_direactory.empty() || paths.size() < 3) {
+      if (m_directory.empty() || paths.size() < 3) {
         response = "HTTP/1.1 404 Not Found\r\n\r\n";
         return response;
       }

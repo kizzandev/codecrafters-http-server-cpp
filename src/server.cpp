@@ -22,10 +22,11 @@ int main(int argc, char **argv) {
     }
     if (!directory.empty()) {
       Server server(4221, directory);
+      server.run();
     }
   } else {
     Server server(4221);
+    server.run();
   }
-  server.run();
   return 0;
 }
