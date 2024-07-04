@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
 
   std::string request;
   // MARK: Receive the request
-  if (recv(client, &request[0], 1024, 0) < 0) {
+  size_t brecv = recv(client, &request[0], 1024, 0);
+  if (brecv < 0) {
     std::cerr << "recv failed\n";
     return 1;
   }
