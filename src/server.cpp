@@ -70,12 +70,31 @@ int main(int argc, char **argv) {
   }
 
   std::cout << "Request: " << request << "\n";
+  bool isPathFound = true;
 
   std::string response;
   // MARK: Handle requests
-  if (request.starts_with("GET / HTTP/1.1\r\n")) {
-    response = "HTTP/1.1 200 OK\r\n\r\n";
-  } else {
+  if (request.starts_with("GET")) {
+    std::string path = request.substr(4, request.find(' ') - 4);
+    std::cout << "Path: " << path << "\n";
+    if (path == "/")
+      response = "HTTP/1.1 200 OK\r\n\r\n";
+    else if (path.starts_with("/echo/")) {
+      // Status
+      response = "HTTP/1.1 200 OK\r\n\r\n";
+      // Headers
+      response += "Content-Type: text/plain\r\n";
+      response += "Content-Length: ";
+      response += std::to_string(path.size() - 6);
+      response += "\r\n\r\n";
+      // Body
+      response += path.substr(6);
+    } else {
+      isPathFound = false;
+    }
+  }
+
+  if (!isPathFound) {
     response = "HTTP/1.1 404 Not Found\r\n\r\n";
   }
 
