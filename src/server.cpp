@@ -116,6 +116,7 @@ int main(int argc, char **argv) {
         if (!line.starts_with("\nUser-Agent")) continue;
 
         std::cout << "The line: " << line << "\n";
+        std::cout << "The UA: " << split(line, ": ")[1] << "\n";
 
         // Status
         response = "HTTP/1.1 200 OK\r\n";
