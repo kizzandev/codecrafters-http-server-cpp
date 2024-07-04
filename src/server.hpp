@@ -44,6 +44,10 @@ struct Request {
 class Server {
  public:
   Server(int port) : m_port(port) { m_server_fd = setup_server(); };
+  Server(int port, const std::string &directory)
+      : m_port(port), m_directory(directory) {
+    m_server_fd = setup_server();
+  };
   ~Server() { close(m_server_fd); };
 
   void run() {
@@ -64,6 +68,7 @@ class Server {
  private:
   int m_port;
   int m_server_fd;
+  std::string m_directory;
 
  private:
   int setup_server() {
@@ -152,6 +157,28 @@ class Server {
         response = "HTTP/1.1 200 OK\r\n";
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: 0\r\n\r\n";
+      }
+    } else if (paths[1] == "files") {
+      if (m_direactory.empty() || paths.size() < 3) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        return response;
+      }
+
+      std::string filename = paths[2];
+      std::ifstream file(m_directory + "/" + filename,
+                         std::ios::binary | std::ios::ate);
+      if (!file.is_open()) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+      } else {
+        response = "HTTP/1.1 200 OK\r\n";
+        response += "Content-Type: application/octet-stream\r\n";
+        response += "Content-Length: ";
+        response += std::to_string(file.tellg());
+        response += "\r\n\r\n";
+        file.seekg(0, std::ios::beg);
+        std::string body((std::istreambuf_iterator<char>(file)),
+                         std::istreambuf_iterator<char>());
+        response += body;
       }
     } else {
       response = "HTTP/1.1 404 Not Found\r\n\r\n";

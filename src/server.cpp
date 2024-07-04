@@ -5,7 +5,27 @@ int main(int argc, char **argv) {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  Server server(4221);
+  // If there are arguments, check if they are:
+  // --directory
+  if (argc > 1) {
+    std::string directory;
+    for (int i = 1; i < argc; i++) {
+      if (std::string(argv[i]) == "--directory") {
+        if (i + 1 < argc) {
+          directory = argv[i + 1];
+          break;
+        } else {
+          std::cerr << "Usage: ./server [--directory <directory>]\n";
+          return 1;
+        }
+      }
+    }
+    if (!directory.empty()) {
+      Server server(4221, directory);
+    }
+  } else {
+    Server server(4221);
+  }
   server.run();
   return 0;
 }
