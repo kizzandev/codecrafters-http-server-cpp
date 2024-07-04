@@ -110,17 +110,18 @@ int main(int argc, char **argv) {
     } else if (path_parts[1] == "user-agent") {
       // Must return the User-Agent header
       auto request_vec = split(request, "\r\n");
-      isPathFound = false;  // If header is not there, wrong path
       // Find the User-Agent header
       for (const auto line : request_vec) {
         if (line.starts_with("User-Agent: ")) {
+          // Status
           response = "HTTP/1.1 200 OK\r\n";
+          // Headers
           response += "Content-Type: text/plain\r\n";
           response += "Content-Length: ";
-          response += split(line, ": ")[1];
+          response += split(line, ": ")[1].size();
           response += "\r\n\r\n";
+          // Body
           response += line;
-          isPathFound = true;
           break;
         }
       }
@@ -131,9 +132,7 @@ int main(int argc, char **argv) {
     isPathFound = false;
   }
 
-  if (!isPathFound) {
-    response = "HTTP/1.1 404 Not Found\r\n\r\n";
-  }
+  if (!isPathFound) response = "HTTP/1.1 404 Not Found\r\n\r\n";
 
   // Send the response
   send(client, response.c_str(), response.size(), 0);
