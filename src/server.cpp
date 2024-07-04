@@ -88,8 +88,9 @@ int main(int argc, char **argv) {
   // MARK: Handle requests
   if (request.starts_with("GET")) {
     std::string path = request.substr(4, request.find(' ') - 4);
-    std::vector<std::string> path_parts = split(path, '/');
     std::cout << "Path: " << path << "\n";
+    std::vector<std::string> path_parts = split(path, '/');
+    std::cout << "Path parts: " << path_parts[2] << "\n";
     if (path == "/")
       response = "HTTP/1.1 200 OK\r\n\r\n";
     else if (path.starts_with("/echo/")) {
