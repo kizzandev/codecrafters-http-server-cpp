@@ -132,6 +132,7 @@ int main(int argc, char **argv) {
 
       // User-Agent header not found
       if (response.empty()) {
+        std::cout << "User-Agent header not found\n";
         // Status
         response = "HTTP/1.1 200 OK\r\n";
         // Headers
