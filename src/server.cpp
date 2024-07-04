@@ -111,7 +111,8 @@ int main(int argc, char **argv) {
       // Must return the User-Agent header
       auto request_vec = split(request, "\r\n");
       // Find the User-Agent header
-      for (const std::string &line : request_vec) {
+      for (std::string line : request_vec) {
+        if (line.empty()) break;
         if (!line.starts_with("User-Agent: ")) continue;
 
         std::cout << "Line: " << line << "\n";
