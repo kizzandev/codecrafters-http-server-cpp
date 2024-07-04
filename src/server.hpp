@@ -150,7 +150,7 @@ class Server {
       }
       if (response.empty()) {
         response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Content-Type: text/plain\r\n\r\n";
+        response += "Content-Type: text/plain\r\n";
         response += "Content-Length: 0\r\n\r\n";
       }
     } else {
