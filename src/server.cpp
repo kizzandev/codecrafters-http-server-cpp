@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, const char delim) {
   std::vector<std::string> elems;
   std::stringstream ss(s);
   std::string item;
@@ -19,6 +19,10 @@ std::vector<std::string> split(const std::string &s, char delim) {
     elems.push_back(item);
   }
   return elems;
+}
+
+std::string get_path(std::string &request) {
+  return split(split(request, "\r\n"), ' ')[1];
 }
 
 int main(int argc, char **argv) {
@@ -87,13 +91,12 @@ int main(int argc, char **argv) {
   std::string response;
   // MARK: Handle requests
   if (request.starts_with("GET")) {
-    std::string path = request.substr(4, request.find(' ') - 4);
+    std::string path = get_path(request);
     std::cout << "Path: " << path << "\n";
     std::vector<std::string> path_parts = split(path, '/');
-    std::cout << "Path parts: " << path_parts[2] << "\n";
     if (path == "/")
       response = "HTTP/1.1 200 OK\r\n\r\n";
-    else if (path.starts_with("/echo/")) {
+    else if (path_parts[1] == "echo") {
       // Status
       response = "HTTP/1.1 200 OK\r\n";
       // Headers
@@ -102,7 +105,7 @@ int main(int argc, char **argv) {
       response += std::to_string(path_parts[2].size());
       response += "\r\n\r\n";
       // Body
-      response += path.substr(6);
+      response += path_parts[2];
     } else {
       isPathFound = false;
     }
