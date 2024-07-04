@@ -22,7 +22,8 @@ std::vector<std::string> split(const std::string &s, const char *delim) {
 }
 
 std::string get_path(std::string &request) {
-  return split(split(request, "\r\n"), " ")[1];
+  auto req = split(request, "\r\n");
+  return split(req[0], " ")[1];
 }
 
 int main(int argc, char **argv) {
