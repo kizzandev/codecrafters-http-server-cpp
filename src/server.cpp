@@ -107,6 +107,17 @@ int main(int argc, char **argv) {
       response += "\r\n\r\n";
       // Body
       response += path_parts[2];
+    } else if (path_parts[1] == "user-agent") {
+      // Must return the User-Agent header
+      // Status
+      response = "HTTP/1.1 200 OK\r\n";
+      // Headers
+      response += "Content-Type: text/plain\r\n";
+      response += "Content-Length: ";
+      response += std::to_string(path_parts[2].size());
+      response += "\r\n\r\n";
+      // Body
+      response += path_parts[2];
     } else {
       isPathFound = false;
     }
