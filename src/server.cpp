@@ -115,15 +115,14 @@ int main(int argc, char **argv) {
         if (line.empty()) break;
         if (!line.starts_with("\nUser-Agent")) continue;
 
-        std::cout << "The line: " << line << "\n";
-        std::cout << "The UA: " << split(line, ": ")[1] << "\n";
+        std::string agent = split(line, ": ")[1].substr(1);
 
         // Status
         response = "HTTP/1.1 200 OK\r\n";
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += split(line, ": ")[1].size();
+        response += agent.size();
         response += "\r\n\r\n";
         break;
       }
