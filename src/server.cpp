@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += split(std::to_string(line), ": ")[1].size();
+        response += split(line, ": ")[1].size();
         response += "\r\n\r\n";
         break;
       }
