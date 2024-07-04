@@ -59,8 +59,10 @@ int main(int argc, char **argv) {
                       (socklen_t *)&client_addr_len);
   std::cout << "Client connected\n";
 
+  // We initialize the buffer with 1024 bytes
   std::string request(1024, '\0');
-  // MARK: Receive the request
+  // recv will return -1 if there is an error
+  // Otherwise it will return the number of bytes received
   size_t brecv = recv(client, &request[0], 1024, 0);
   if (brecv < 0) {
     std::cerr << "recv failed\n";
@@ -70,14 +72,14 @@ int main(int argc, char **argv) {
   std::cout << "Request: " << request << "\n";
 
   std::string response;
-  // MARK: Handle the request
+  // MARK: Handle requests
   if (request.starts_with("GET / HTTP/1.1\r\n")) {
     response = "HTTP/1.1 200 OK\r\n\r\n";
   } else {
     response = "HTTP/1.1 404 Not Found\r\n\r\n";
   }
 
-  // MARK: Send the response
+  // Send the response
   send(client, response.c_str(), response.size(), 0);
 
   close(server_fd);
