@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += split(line, ": ")[1].size();
+        response += split(line, ": ")[1].length();
         response += "\r\n\r\n";
         // Body
         response += line;
