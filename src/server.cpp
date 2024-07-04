@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
                       (socklen_t *)&client_addr_len);
   std::cout << "Client connected\n";
 
-  std::string request;
+  std::string request(1024, '\0');
   // MARK: Receive the request
   size_t brecv = recv(client, &request[0], 1024, 0);
   if (brecv < 0) {
