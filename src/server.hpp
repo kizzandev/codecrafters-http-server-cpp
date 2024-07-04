@@ -126,7 +126,7 @@ class Server {
       // Status
       response = "HTTP/1.1 200 OK\r\n\r\n";
       // Headers
-      response += "Content-Type: text/plain\r\n\r\n";
+      response += "Content-Type: text/plain\r\n";
       response += "Content-Length: ";
       response += std::to_string(paths[2].size());
       response += "\r\n\r\n";
