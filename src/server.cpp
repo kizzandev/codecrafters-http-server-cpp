@@ -124,6 +124,8 @@ int main(int argc, char **argv) {
         response += "Content-Length: ";
         response += std::to_string(agent.size());
         response += "\r\n\r\n";
+        // Body
+        response += agent;
         break;
       }
 
