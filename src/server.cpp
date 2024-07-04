@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
       // Must return the User-Agent header
       auto request_vec = split(request, "\r\n");
       // Find the User-Agent header
-      for (std::string line : request_vec) {
+      for (auto &line : request_vec) {
         if (line.empty()) break;
         if (!line.starts_with("\nUser-Agent")) continue;
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += size_t(line.size() - 11);
+        response += split(std::to_string(line), ": ")[1].size();
         response += "\r\n\r\n";
         break;
       }
