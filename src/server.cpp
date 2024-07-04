@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
       for (std::string line : request_vec) {
         std::cout << "Line: " << line << "\n";
         if (line.empty()) break;
-        if (!line.starts_with("User-Agent")) continue;
+        if (!line.starts_with("\nUser-Agent")) continue;
 
         // Status
         response = "HTTP/1.1 200 OK\r\n";
