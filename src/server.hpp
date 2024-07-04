@@ -124,7 +124,7 @@ class Server {
       response = "HTTP/1.1 200 OK\r\n\r\n";
     } else if (paths[1] == "echo") {
       // Status
-      response = "HTTP/1.1 200 OK\r\n\r\n";
+      response = "HTTP/1.1 200 OK\r\n";
       // Headers
       response += "Content-Type: text/plain\r\n";
       response += "Content-Length: ";
@@ -137,7 +137,7 @@ class Server {
         if (header.find("User-Agent:") != std::string::npos) {
           std::string agent = split(header, ':')[1].substr(1);
           // Status
-          response = "HTTP/1.1 200 OK\r\n\r\n";
+          response = "HTTP/1.1 200 OK\r\n";
           // Headers
           response += "Content-Type: text/plain\r\n";
           response += "Content-Length: ";
@@ -149,7 +149,7 @@ class Server {
         }
       }
       if (response.empty()) {
-        response = "HTTP/1.1 200 OK\r\n\r\n";
+        response = "HTTP/1.1 200 OK\r\n";
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: 0\r\n\r\n";
       }
