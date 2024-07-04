@@ -125,6 +125,15 @@ int main(int argc, char **argv) {
           break;
         }
       }
+
+      // User-Agent header not found
+      if (response.empty()) {
+        // Status
+        response = "HTTP/1.1 200 OK\r\n";
+        // Headers
+        response += "Content-Type: text/plain\r\n";
+        response += "Content-Length: 0\r\n\r\n";
+      }
     } else {
       isPathFound = false;
     }
