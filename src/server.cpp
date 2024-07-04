@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, const char *delim) {
   std::vector<std::string> elems;
   std::stringstream ss(s);
   std::string item;
@@ -22,7 +22,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 std::string get_path(std::string &request) {
-  return split(split(request, "\r\n"), ' ')[1];
+  return split(split(request, "\r\n"), " ")[1];
 }
 
 int main(int argc, char **argv) {
