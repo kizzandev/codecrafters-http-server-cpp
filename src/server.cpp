@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         // Headers
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: ";
-        response += line.size() - 11;
+        response += size_t(line.size() - 11);
         response += "\r\n\r\n";
         break;
       }
