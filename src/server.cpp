@@ -113,10 +113,10 @@ int main(int argc, char **argv) {
       // Find the User-Agent header
       for (const std::string &line : request_vec) {
         if (line.empty()) break;
-        std::cout << "Line: " << line << "\n";
-        std::cout << "Size: " << line.size() << "\n";
 
         if (line.starts_with("User-Agent: ")) {
+          std::cout << "Line: " << line << "\n";
+          std::cout << "Size: " << line.size() << "\n";
           // Status
           response = "HTTP/1.1 200 OK\r\n";
           // Headers
