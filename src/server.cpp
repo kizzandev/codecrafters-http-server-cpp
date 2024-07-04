@@ -122,8 +122,6 @@ int main(int argc, char **argv) {
         response += "Content-Length: ";
         response += split(line, ": ")[1].size();
         response += "\r\n\r\n";
-        // Body
-        response += line;
         break;
       }
 
