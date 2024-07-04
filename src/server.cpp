@@ -7,7 +7,19 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
+
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::vector<std::string> elems;
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
+  return elems;
+}
 
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
@@ -76,6 +88,7 @@ int main(int argc, char **argv) {
   // MARK: Handle requests
   if (request.starts_with("GET")) {
     std::string path = request.substr(4, request.find(' ') - 4);
+    std::vector<std::string> path_parts = split(path, '/');
     std::cout << "Path: " << path << "\n";
     if (path == "/")
       response = "HTTP/1.1 200 OK\r\n\r\n";
@@ -85,7 +98,7 @@ int main(int argc, char **argv) {
       // Headers
       response += "Content-Type: text/plain\r\n";
       response += "Content-Length: ";
-      response += std::to_string(path.size() - 6);
+      response += std::to_string(path_parts[2].size());
       response += "\r\n\r\n";
       // Body
       response += path.substr(6);
