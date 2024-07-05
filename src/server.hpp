@@ -51,14 +51,6 @@ struct Response {
   std::string status;
   std::string headers;
   std::string body;
-
-  // operator to assign each member variable
-  Response &operator=(const Response &other) {
-    status = other.status;
-    headers = other.headers;
-    body = other.body;
-    return *this;
-  }
 };
 
 class Server {
@@ -153,19 +145,19 @@ class Server {
 
     if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
-        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
         return
       }
       std::string filename = paths[2];
       std::ofstream file(m_directory + "/" + filename, std::ios::binary);
       if (!file.is_open()) {
-        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
       } else {
-        response.status = "HTTP/1.1 201 Created\r\n\r\n";
+        response = {.status = "HTTP/1.1 201 Created\r\n\r\n"};
         file << request.body;
       }
     } else {
-      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+      response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
   }
 
@@ -173,25 +165,28 @@ class Server {
     std::vector<std::string> paths = split(request.path, '/');
 
     if (request.path == "/") {
-      response.status = "HTTP/1.1 200 OK\r\n\r\n";
+      response = {.status = "HTTP/1.1 200 OK\r\n\r\n"};
     } else if (paths[1] == "echo") {
-      response.status = "HTTP/1.1 200 OK\r\n";
-      response.headers = "Content-Type: text/plain\r\n";
-      response.headers += "Content-Length: ";
-      response.headers += std::to_string(paths[2].size());
-      response.headers += "\r\n\r\n";
-      response.body = paths[2];
+      response = {
+        .status = "HTTP/1.1 200 OK\r\n",
+        .headers = "Content-Type: text/plain\r\n",
+        .headers += "Content-Length: ",
+        .headers += std::to_string(paths[2].size()),
+        .headers += "\r\n\r\n",
+        .body = paths[2]
+      }
     } else if (paths[1] == "user-agent") {
       for (const std::string &header : request.headers) {
         if (header.find("User-Agent:") != std::string::npos) {
           std::string agent = split(header, ':')[1].substr(1);
-          response.status = "HTTP/1.1 200 OK\r\n";
-          response.headers = "Content-Type: text/plain\r\n";
-          response.headers += "Content-Length: ";
-          response.headers += std::to_string(agent.size());
-          response.headers += "\r\n\r\n";
-          response.body = agent;
-          break;
+          response = {
+            .status = "HTTP/1.1 200 OK\r\n",
+            .headers = "Content-Type: text/plain\r\n",
+            .headers += "Content-Length: ",
+            .headers += std::to_string(agent.size()),
+            .headers += "\r\n\r\n",
+            .body = agent
+          } break;
         }
       }
       if (response.empty()) {
@@ -201,7 +196,7 @@ class Server {
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
-        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response = {.status "HTTP/1.1 404 Not Found\r\n\r\n"};
         return;
       }
 
@@ -209,7 +204,7 @@ class Server {
       std::ifstream file(m_directory + "/" + filename,
                          std::ios::binary | std::ios::ate);
       if (!file.is_open()) {
-        response.status "HTTP/1.1 404 Not Found\r\n\r\n";
+        response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
       } else {
         response.status = "HTTP/1.1 200 OK\r\n";
         response.headers = "Content-Type: application/octet-stream\r\n";
@@ -230,7 +225,7 @@ class Server {
     Response response;
 
     if (!allowed_method(request)) {
-      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+      response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
 
     // std::string response;
@@ -239,7 +234,7 @@ class Server {
     } else if (request.method == "GET") {
       handle_get(request, response);
     } else {
-      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+      response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
 
     /*if (request.headers.size() > 0) {
