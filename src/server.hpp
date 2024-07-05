@@ -248,14 +248,10 @@ class Server {
         }
 
         response.headers += "Content-Encoding: gzip\r\n";
-        std::stringstream compressed;
-        boost::iostreams::filtering_ostream gzip_stream;
-        gzip_stream.push(boost::iostreams::gzip_compressor());
-        gzip_stream.push(compressed);
-        gzip_stream << response.body;
-        gzip_stream.flush();
-        response.body = compressed.str();
-      }
+        // use zlib
+        std::string gzip_body = gzip(response.body);
+        response.body = gzip_body;
+            }
     }
 
     std::string response_str =
