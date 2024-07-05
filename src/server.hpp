@@ -70,8 +70,19 @@ class Server {
   int m_port;
   int m_server_fd;
   std::string m_directory;
+  std::vector<std::string> m_allowed_methods = {"GET", "POST"};
 
  private:
+  // Allowed methods: GET, POST
+  bool allowed_method(const Request &request) {
+    for (const std::string &method : m_allowed_methods) {
+      if (request.method == method) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   int setup_server() {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
@@ -121,7 +132,7 @@ class Server {
   std::string handle_request(const Request &request) {
     std::string response;
 
-    if (request.method != "GET") {
+    if (!allowed_method(request)) {
       return "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
@@ -159,7 +170,7 @@ class Server {
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: 0\r\n\r\n";
       }
-    } else if (paths[1] == "files") {
+    } else if (paths[1] == "files" && request.method == "GET") {
       if (m_directory.empty() || paths.size() < 3) {
         response = "HTTP/1.1 404 Not Found\r\n\r\n";
         return response;
@@ -180,6 +191,19 @@ class Server {
         std::string body((std::istreambuf_iterator<char>(file)),
                          std::istreambuf_iterator<char>());
         response += body;
+      }
+    } else if (paths[1] == "files" && request.method == "POST") {
+      if (m_directory.empty() || paths.size() < 3) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        return response;
+      }
+      std::string filename = paths[2];
+      std::ofstream file(m_directory + "/" + filename, std::ios::binary);
+      if (!file.is_open()) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+      } else {
+        response = "HTTP/1.1 200 OK\r\n\r\n";
+        file << request.body;
       }
     } else {
       response = "HTTP/1.1 404 Not Found\r\n\r\n";
