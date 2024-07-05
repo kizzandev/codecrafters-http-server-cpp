@@ -140,7 +140,7 @@ class Server {
     send(client_fd, response.c_str(), response.size(), 0);
   }
 
-  void handle_post(const Request &request, const Response &response) {
+  void handle_post(const Request &request, Response &response) {
     std::vector<std::string> paths = split(request.path, '/');
 
     if (paths[1] == "files") {
@@ -161,7 +161,7 @@ class Server {
     }
   }
 
-  void handle_get(const Request &request, const Response &response) {
+  void handle_get(const Request &request, Response &response) {
     std::vector<std::string> paths = split(request.path, '/');
 
     if (request.path == "/") {
