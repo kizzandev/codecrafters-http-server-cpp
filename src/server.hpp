@@ -114,7 +114,7 @@ class Server {
     compressed << std::dec << std::setfill(' ');
     std::cout << "SIZE AFTER COMPRESSION WITH GZIP: " << compressed.size()
               << std::endl;
-    return compressed;
+    return compressed.str();
   }
 
   int setup_server() {
