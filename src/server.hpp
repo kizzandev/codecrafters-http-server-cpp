@@ -168,7 +168,7 @@ class Server {
     } else if (paths[1] == "echo") {
       response = {.status = "HTTP/1.1 200 OK\r\n",
                   .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                             std::to_string(paths[2].size()) + "\r\n\r\n",
+                             std::to_string(paths[2].size()),
                   .body = paths[2]};
     } else if (paths[1] == "user-agent") {
       for (const std::string &header : request.headers) {
@@ -177,15 +177,14 @@ class Server {
           response = {
               .status = "HTTP/1.1 200 OK\r\n",
               .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                         std::to_string(agent.size()) + "\r\n\r\n",
+                         std::to_string(agent.size()),
               .body = agent};
           break;
         }
       }
       if (response.body.empty()) {
-        response = {
-            .status = "HTTP/1.1 200 OK\r\n",
-            .headers = "Content-Type: text/plain\r\nContent-Length: 0\r\n\r\n"};
+        response = {.status = "HTTP/1.1 200 OK\r\n",
+                    .headers = "Content-Type: text/plain\r\nContent-Length: 0"};
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
@@ -206,12 +205,18 @@ class Server {
             .status = "HTTP/1.1 200 OK\r\n",
             .headers =
                 "Content-Type: application/octet-stream\r\nContent-Length: " +
-                std::to_string(body.size()) + "\r\n\r\n",
+                std::to_string(body.size()),
             .body = body};
       }
     } else {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
+
+    if (request.headers.find("Accept-Encoding") != std::string::npos) {
+      response.headers += "Content-Encoding: gzip";
+    }
+
+    response.headers += "\r\n\r\n";
   }
 
   std::string handle_request(const Request &request) {
