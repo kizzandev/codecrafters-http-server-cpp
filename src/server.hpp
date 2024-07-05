@@ -6,6 +6,7 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -216,6 +217,17 @@ class Server {
     }
   }
 
+  std::string gzip(const std::string &body) {
+    std::stringstream compressed;
+    std::stringstream uncompressed(body);
+    boost::iostreams::filtering_ostream out;
+    out.push(boost::iostreams::gzip_compressor());
+    out.push(compressed);
+    boost::iostreams::copy(uncompressed, out);
+    out.flush();
+    return compressed.str();
+  }
+
   std::string handle_request(const Request &request) {
     Response response;
 
@@ -246,11 +258,19 @@ class Server {
         if (pos != std::string::npos) {
           response.headers.erase(pos, 17);
         }
+        pos = response.headers.find("Content-Length");
+        if (pos != std::string::npos) {
+          response.headers.erase(pos, 15);
+        }
 
         response.headers += "Content-Encoding: gzip\r\n";
         // use zlib
-        std::string gzip_body = std::gzip(response.body);
+        std::string gzip_body = gzip(response.body);
         response.body = gzip_body;
+
+        response.headers +=
+            "Content-Length: " + std::to_string(response.body.size()) +
+            "\r\n\r\n";
       }
     }
 
