@@ -190,7 +190,7 @@ class Server {
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
-        response = {.status "HTTP/1.1 404 Not Found\r\n\r\n"};
+        response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
         return;
       }
 
