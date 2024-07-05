@@ -231,26 +231,27 @@ class Server {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
 
-    /*if (request.headers.size() > 0) {
+    if (request.headers.size() > 0) {
+      bool is_gzip = false;
       for (const std::string &header : request.headers) {
-        if (header.find("Content-Encoding:") != std::string::npos) {
-          response.body = compress(response.body);
-          if (std::find(response.headers.begin(), response.headers.end(),
-                        "Content-Length:") != response.headers.end()) {
-            response.headers.erase(
-                std::remove(response.headers.begin(), response.headers.end(),
-                            "Content-Length:"),
-                response.headers.end());
-            response.headers.push_back("Content-Length: " +
-                                       std::to_string(response.body.size()));
-          }
+        if (header.find("Accept-Encoding: gzip") != std::string::npos) {
+          is_gzip = true;
           break;
         }
       }
-    }*/
 
-    std::string response_str =
-        response.status + response.headers + response.body;
-    return response_str;
+      if (is_gzip) {
+        response.body = gzip(response.body);
+        response.headers = "Content-Encoding: gzip\r\nContent-Length: " +
+                           std::to_string(response.body.size()) + "\r\n\r\n";
+      } else {
+        response.headers =
+            "Content-Length: " + std::to_string(response.body.size()) +
+            "\r\n\r\n";
+      }
+    }
   }
+
+  std::string response_str = response.status + response.headers + response.body;
+  return response_str;
 };
