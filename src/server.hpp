@@ -212,7 +212,7 @@ class Server {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
 
-    if (request.headers.find("Accept-Encoding") != std::string::npos) {
+    if (std::find(request.headers.begin(), request.headers.end(), "Accept-Encoding: ") {
       response.headers += "Content-Encoding: gzip";
     }
 
