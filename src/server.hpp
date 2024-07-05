@@ -265,7 +265,7 @@ class Server {
             .status = "HTTP/1.1 200 OK\r\n",
             .headers =
                 "Content-Type: application/octet-stream\r\nContent-Length: " +
-                std::to_string(body.size()),
+                std::to_string(body.size()) + "\r\n",
             .body = body};
       }
     } else {
