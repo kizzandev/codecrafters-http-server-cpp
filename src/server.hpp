@@ -113,7 +113,7 @@ class Server {
       compressed << std::setw(2) << static_cast<int>(c);
     }
     compressed << std::dec << std::setfill(' ');
-    std::cout << "SIZE AFTER COMPRESSION WITH GZIP: " << compressed.size()
+    std::cout << "SIZE AFTER COMPRESSION WITH GZIP: " << compressed.str().size()
               << std::endl;
     return compressed.str();
   }
