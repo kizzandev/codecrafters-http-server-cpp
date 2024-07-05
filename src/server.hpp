@@ -40,12 +40,9 @@ struct Request {
       req.headers.push_back(lines[i]);
     }
 
+    req.body = lines[lines.size() - 1].substr(1);  // remove \n
     size_t lastNonZero = req.body.find_last_not_of('\x00');
-    if (lastNonZero != std::string::npos) {
-      req.body = req.body.substr(1, lastNonZero + 1);
-    } else {
-      req.body = req.body.substr(1);
-    }
+    if (lastNonZero != std::string::npos) req.body.resize(lastNonZero + 1);
 
     return req;
   }
