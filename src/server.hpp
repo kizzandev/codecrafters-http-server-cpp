@@ -215,6 +215,18 @@ class Server {
     }
   }
 
+  std::string compress_gzip(const std::string &body) {
+    std::string compressed;
+    int status =
+        compress((Bytef *)compressed.data(), (uLongf *)&compressed.size(),
+                 (Bytef *)body.data(), body.size());
+    if (status != Z_OK) {
+      std::cerr << "compress failed\n";
+      exit(EXIT_FAILURE);
+    }
+    return compressed;
+  }
+
   std::string handle_request(const Request &request) {
     Response response;
 
@@ -241,13 +253,9 @@ class Server {
       }
 
       if (is_gzip) {
-        response.body = gzip(response.body);
+        response.body = compress_gzip(response.body);
         response.headers = "Content-Encoding: gzip\r\nContent-Length: " +
                            std::to_string(response.body.size()) + "\r\n\r\n";
-      } else {
-        response.headers =
-            "Content-Length: " + std::to_string(response.body.size()) +
-            "\r\n\r\n";
       }
     }
 
