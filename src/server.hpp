@@ -27,6 +27,7 @@ struct Request {
   std::string path;
   std::string http_version;
   std::vector<std::string> headers;
+  std::string body;
 
   static Request parse(const std::string &request) {
     Request req;
@@ -35,9 +36,10 @@ struct Request {
     req.method = req_line[0];
     req.path = req_line[1];
     req.http_version = req_line[2];
-    for (auto i = 1; i < lines.size(); ++i) {
+    for (auto i = 1; i < lines.size() - 1; ++i) {
       req.headers.push_back(lines[i]);
     }
+    req.body = lines[lines.size() - 1];
     return req;
   }
 };
