@@ -51,7 +51,7 @@ struct Response {
   std::string status;
   std::string headers;
   std::string body;
-}
+};
 
 class Server {
  public:
@@ -140,94 +140,84 @@ class Server {
     send(client_fd, response.c_str(), response.size(), 0);
   }
 
-  std::string handle_post(const Request &request, const Response &response) {
-    std::string response;
+  void handle_post(const Request &request, const Response &response) {
+    // std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
     if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
-        return response;
+        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+        return
       }
       std::string filename = paths[2];
       std::ofstream file(m_directory + "/" + filename, std::ios::binary);
       if (!file.is_open()) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
       } else {
-        response = "HTTP/1.1 201 Created\r\n\r\n";
+        response.status = "HTTP/1.1 201 Created\r\n\r\n";
         file << request.body;
       }
     } else {
-      response = "HTTP/1.1 404 Not Found\r\n\r\n";
+      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
-
-    return response;
   }
 
-  std::string handle_get(const Request &request, const Response &response) {
+  void handle_get(const Request &request, const Response &response) {
     std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
     if (request.path == "/") {
-      response = "HTTP/1.1 200 OK\r\n\r\n";
+      response.status = "HTTP/1.1 200 OK\r\n\r\n";
     } else if (paths[1] == "echo") {
-      // Status
-      response = "HTTP/1.1 200 OK\r\n";
-      // Headers
-      response += "Content-Type: text/plain\r\n";
-      response += "Content-Length: ";
-      response += std::to_string(paths[2].size());
-      response += "\r\n\r\n";
-      // Body
-      response += paths[2];
+      response.status = "HTTP/1.1 200 OK\r\n";
+      response.headers = "Content-Type: text/plain\r\n";
+      response.headers += "Content-Length: ";
+      response.headers += std::to_string(paths[2].size());
+      response.headers += "\r\n\r\n";
+      response.body = paths[2];
     } else if (paths[1] == "user-agent") {
       for (const std::string &header : request.headers) {
         if (header.find("User-Agent:") != std::string::npos) {
           std::string agent = split(header, ':')[1].substr(1);
-          // Status
-          response = "HTTP/1.1 200 OK\r\n";
-          // Headers
-          response += "Content-Type: text/plain\r\n";
-          response += "Content-Length: ";
-          response += std::to_string(agent.size());
-          response += "\r\n\r\n";
-          // Body
-          response += agent;
+          response.status = "HTTP/1.1 200 OK\r\n";
+          response.headers = "Content-Type: text/plain\r\n";
+          response.headers += "Content-Length: ";
+          response.headers += std::to_string(agent.size());
+          response.headers += "\r\n\r\n";
+          response.body = agent;
           break;
         }
       }
       if (response.empty()) {
-        response = "HTTP/1.1 200 OK\r\n";
-        response += "Content-Type: text/plain\r\n";
-        response += "Content-Length: 0\r\n\r\n";
+        response.status = "HTTP/1.1 200 OK\r\n";
+        response.headers = "Content-Type: text/plain\r\n";
+        response.headers += "Content-Length: 0\r\n\r\n";
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
-        return response;
+        response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+        return;
       }
 
       std::string filename = paths[2];
       std::ifstream file(m_directory + "/" + filename,
                          std::ios::binary | std::ios::ate);
       if (!file.is_open()) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response.status "HTTP/1.1 404 Not Found\r\n\r\n";
       } else {
-        response = "HTTP/1.1 200 OK\r\n";
-        response += "Content-Type: application/octet-stream\r\n";
-        response += "Content-Length: ";
-        response += std::to_string(file.tellg());
-        response += "\r\n\r\n";
+        response.status = "HTTP/1.1 200 OK\r\n";
+        response.headers = "Content-Type: application/octet-stream\r\n";
+        response.headers += "Content-Length: ";
+        response.headers += std::to_string(file.tellg());
+        response.headers += "\r\n\r\n";
         file.seekg(0, std::ios::beg);
         std::string body((std::istreambuf_iterator<char>(file)),
                          std::istreambuf_iterator<char>());
-        response += body;
+        response.body = body;
       }
     } else {
-      response = "HTTP/1.1 404 Not Found\r\n\r\n";
+      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
-
-    return response;
   }
 
   std::string handle_request(const Request &request) {
