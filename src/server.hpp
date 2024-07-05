@@ -213,7 +213,7 @@ class Server {
     }
 
     if (std::find(request.headers.begin(), request.headers.end(),
-                  "Accept-Encoding: ")) {
+                  "Accept-Encoding: ") != request.headers.end()) {
       response.headers += "Content-Encoding: gzip";
     }
 
