@@ -216,7 +216,10 @@ class Server {
       auto accept_encoding = header.find("Accept-Encoding:");
       if (accept_encoding != std::string::npos) {
         response.headers += "\r\nContent-Encoding: ";
-        response.headers += split(header, ':')[1].substr(1);
+        if (header.find("gzip") != std::string::npos) {
+          response.headers += "gzip";
+        }
+        // response.headers += split(header, ':')[1].substr(1);
         break;
       }
     }
