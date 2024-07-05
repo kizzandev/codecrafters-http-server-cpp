@@ -217,6 +217,11 @@ class Server {
       response.headers += "Content-Encoding: gzip";
     }
 
+    std::cout << "REQUEST: ";
+    for (const std::string &header : request.headers) {
+      std::cout << header << " ";
+    }
+    std::cout << std::endl;
     std::cout << "HEADERS: " << response.headers << std::endl;
 
     response.headers += "\r\n\r\n";
