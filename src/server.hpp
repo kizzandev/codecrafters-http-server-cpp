@@ -93,6 +93,26 @@ class Server {
     return false;
   }
 
+  void replace_header(Response &response, const std::string &header,
+                      const std::string &value) {
+    size_t pos = response.headers.find(header);
+    if (pos != std::string::npos) {
+      size_t end = response.headers.find("\r\n", pos);
+      response.headers.erase(pos, end - pos + 2);
+    }
+    response.headers += header + ": " + value + "\r\n";
+  }
+
+  std::string compress_gzip(const std::string &body) {
+    std::stringstream ss;
+    ss << std::hex << body.size();
+    ss << "\r\n";
+    ss << body;
+    ss << "\r\n";
+    std::string compressed = ss.str();
+    return compressed;
+  }
+
   int setup_server() {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
@@ -168,7 +188,7 @@ class Server {
     } else if (paths[1] == "echo") {
       response = {.status = "HTTP/1.1 200 OK\r\n",
                   .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                             std::to_string(paths[2].size()),
+                             std::to_string(paths[2].size()) + "\r\n",
                   .body = paths[2]};
     } else if (paths[1] == "user-agent") {
       for (const std::string &header : request.headers) {
@@ -177,14 +197,15 @@ class Server {
           response = {
               .status = "HTTP/1.1 200 OK\r\n",
               .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                         std::to_string(agent.size()),
+                         std::to_string(agent.size()) + "\r\n",
               .body = agent};
           break;
         }
       }
       if (response.body.empty()) {
-        response = {.status = "HTTP/1.1 200 OK\r\n",
-                    .headers = "Content-Type: text/plain\r\nContent-Length: 0"};
+        response = {
+            .status = "HTTP/1.1 200 OK\r\n",
+            .headers = "Content-Type: text/plain\r\nContent-Length: 0\r\n"};
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
@@ -215,16 +236,18 @@ class Server {
     for (const std::string &header : request.headers) {
       auto accept_encoding = header.find("Accept-Encoding:");
       if (accept_encoding != std::string::npos) {
-        response.headers += "\r\nContent-Encoding: ";
+        response.headers += "Content-Encoding: ";
         if (header.find("gzip") != std::string::npos) {
-          response.headers += "gzip";
+          response.headers += "gzip\r\n";
+          response.body = compress_gzip(response.body);
+          replace_header(response, "Content-Length",
+                         std::to_string(response.body.size()));
         }
-        // response.headers += split(header, ':')[1].substr(1);
         break;
       }
     }
 
-    response.headers += "\r\n\r\n";
+    response.headers += "\r\n";
   }
 
   std::string handle_request(const Request &request) {
