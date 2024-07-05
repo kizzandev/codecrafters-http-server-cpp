@@ -3,16 +3,18 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <zlib.h>
 
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <iomanip>
 
 std::vector<std::string> split(const std::string &s, const char delim) {
   std::vector<std::string> elems;
@@ -105,17 +107,49 @@ class Server {
   }
 
   std::string compress_gzip(const std::string &body) {
-    std::cout << "SIZE BEFORE COMPRESSION WITH GZIP: " << body.size()
-              << std::endl;
-    std::stringstream compressed(std::ios_base::binary | std::ios_base::out);
-    compressed << std::hex << std::setfill('0');
-    for (char c : body) {
-      compressed << std::setw(2) << static_cast<int>(c);
+    try {
+      std::cout << "Size before gzip compression: " << body.size() << std::endl;
+
+      z_stream stream{};
+      stream.next_in =
+          reinterpret_cast<Bytef *>(const_cast<char *>(body.c_str()));
+      stream.avail_in = body.size();
+
+      if (deflateInit2(&stream, Z_BEST_COMPRESSION, Z_DEFLATED, 15 | 16, 8,
+                       Z_DEFAULT_STRATEGY) != Z_OK) {
+        throw std::runtime_error("Failed to initialize zlib");
+      }
+
+      std::stringstream compressed;
+      char buffer[32768];
+      int ret;
+
+      do {
+        stream.next_out = reinterpret_cast<Bytef *>(buffer);
+        stream.avail_out = sizeof(buffer);
+        ret = deflate(&stream, Z_FINISH);
+        if (compressed.write(buffer, sizeof(buffer) - stream.avail_out)
+                .fail()) {
+          deflateEnd(&stream);
+          throw std::runtime_error("Failed to write compressed data");
+        }
+      } while (ret == Z_OK);
+
+      deflateEnd(&stream);
+
+      if (ret != Z_STREAM_END) {
+        throw std::runtime_error("Failed to compress data");
+      }
+
+      std::string compressed_str = compressed.str();
+      std::cout << "Size after gzip compression: " << compressed_str.size()
+                << std::endl;
+      return compressed_str;
+
+    } catch (const std::exception &e) {
+      std::cerr << "Compression error: " << e.what() << std::endl;
+      return body;
     }
-    compressed << std::dec << std::setfill(' ');
-    std::cout << "SIZE AFTER COMPRESSION WITH GZIP: " << compressed.str().size()
-              << std::endl;
-    return compressed.str();
   }
 
   int setup_server() {
