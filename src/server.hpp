@@ -6,7 +6,6 @@
 #include <zlib.h>
 
 #include <algorithm>
-#include <boost>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -258,19 +257,19 @@ class Server {
         if (pos != std::string::npos) {
           response.headers.erase(pos, 17);
         }
-        pos = response.headers.find("Content-Length");
+        /*pos = response.headers.find("Content-Length");
         if (pos != std::string::npos) {
           response.headers.erase(pos, 15);
-        }
+        }*/
 
         response.headers += "Content-Encoding: gzip\r\n";
         // use zlib
-        std::string gzip_body = gzip(response.body);
+        /*std::string gzip_body = gzip(response.body);
         response.body = gzip_body;
 
         response.headers +=
             "Content-Length: " + std::to_string(response.body.size()) +
-            "\r\n\r\n";
+            "\r\n\r\n";*/
       }
     }
 
