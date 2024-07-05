@@ -219,9 +219,7 @@ class Server {
         break;
       }
     }
-    if (is_gzip) {
-      response.headers += "\r\nContent-Encoding: gzip";
-    }
+    if (is_gzip) response.headers += "\r\nContent-Encoding: gzip";
 
     response.headers += "\r\n\r\n";
   }
