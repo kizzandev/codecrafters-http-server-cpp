@@ -48,9 +48,9 @@ struct Request {
 };
 
 struct Response {
-  std::string status;
-  std::string headers;
-  std::string body;
+  std::string status = "";
+  std::string headers = "";
+  std::string body = "";
 };
 
 class Server {
