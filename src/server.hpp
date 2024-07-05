@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <zlib.h>
 
 #include <algorithm>
 #include <cstdlib>
