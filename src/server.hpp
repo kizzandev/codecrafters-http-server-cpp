@@ -275,8 +275,8 @@ class Server {
     for (const std::string &header : request.headers) {
       auto accept_encoding = header.find("Accept-Encoding:");
       if (accept_encoding != std::string::npos) {
-        response.headers += "Content-Encoding: ";
         if (header.find("gzip") != std::string::npos) {
+          response.headers += "Content-Encoding: ";
           response.headers += "gzip\r\n";
           response.body = compress_gzip(response.body);
           replace_header(response, "Content-Length",
