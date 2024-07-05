@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -45,6 +46,12 @@ struct Request {
     return req;
   }
 };
+
+struct Response {
+  std::string status;
+  std::string headers;
+  std::string body;
+}
 
 class Server {
  public:
@@ -133,7 +140,7 @@ class Server {
     send(client_fd, response.c_str(), response.size(), 0);
   }
 
-  std::string handle_post(const Request &request) {
+  std::string handle_post(const Request &request, const Response &response) {
     std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
@@ -157,7 +164,7 @@ class Server {
     return response;
   }
 
-  std::string handle_get(const Request &request) {
+  std::string handle_get(const Request &request, const Response &response) {
     std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
@@ -228,11 +235,36 @@ class Server {
       return "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
-    if (request.method == "POST")
-      return handle_post(request);
-    else if (request.method == "GET")
-      return handle_get(request);
-    else
-      return "HTTP/1.1 404 Not Found\r\n\r\n";
+    Response response;
+    // std::string response;
+    if (request.method == "POST") {
+      handle_post(request, response);
+    } else if (request.method == "GET") {
+      handle_get(request, response);
+    } else {
+      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
+    }
+
+    if (request.headers.size() > 0) {
+      for (const std::string &header : request.headers) {
+        if (header.find("Content-Encoding:") != std::string::npos) {
+          response.body = compress(response.body);
+          if (std::find(response.headers.begin(), response.headers.end(),
+                        "Content-Length:") != response.headers.end()) {
+            response.headers.erase(
+                std::remove(response.headers.begin(), response.headers.end(),
+                            "Content-Length:"),
+                response.headers.end());
+            response.headers.push_back("Content-Length: " +
+                                       std::to_string(response.body.size()));
+          }
+          break;
+        }
+      }
+    }
+
+    std::string response_str =
+        response.status + response.headers + response.body;
+    return response_str;
   }
 };
