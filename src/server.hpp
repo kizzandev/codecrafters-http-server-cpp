@@ -167,30 +167,26 @@ class Server {
     if (request.path == "/") {
       response = {.status = "HTTP/1.1 200 OK\r\n\r\n"};
     } else if (paths[1] == "echo") {
-      response = {
-        .status = "HTTP/1.1 200 OK\r\n",
-        .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                   std::to_string(paths[2].size()) + "\r\n\r\n",
-        .body = paths[2]
-      }
+      response = {.status = "HTTP/1.1 200 OK\r\n",
+                  .headers = "Content-Type: text/plain\r\nContent-Length: " +
+                             std::to_string(paths[2].size()) + "\r\n\r\n",
+                  .body = paths[2]};
     } else if (paths[1] == "user-agent") {
       for (const std::string &header : request.headers) {
         if (header.find("User-Agent:") != std::string::npos) {
           std::string agent = split(header, ':')[1].substr(1);
           response = {
-            .status = "HTTP/1.1 200 OK\r\n",
-            .headers = "Content-Type: text/plain\r\nContent-Length: " +
-                       std::to_string(agent.size()) + "\r\n\r\n",
-            .body = agent
-          } break;
+              .status = "HTTP/1.1 200 OK\r\n",
+              .headers = "Content-Type: text/plain\r\nContent-Length: " +
+                         std::to_string(agent.size()) + "\r\n\r\n",
+              .body = agent};
+          break;
         }
       }
-      if (response.empty()) {
+      if (response.body.empty()) {
         response = {
-          .status = "HTTP/1.1 200 OK\r\n",
-          .headers = "Content-Type: text/plain\r\nContent-Length: 0\r\n\r\n",
-          .body = request.body
-        }
+            .status = "HTTP/1.1 200 OK\r\n",
+            .headers = "Content-Type: text/plain\r\nContent-Length: 0\r\n\r\n"};
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
