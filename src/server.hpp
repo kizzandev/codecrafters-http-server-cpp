@@ -141,7 +141,6 @@ class Server {
   }
 
   void handle_post(const Request &request, const Response &response) {
-    // std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
     if (paths[1] == "files") {
@@ -163,7 +162,6 @@ class Server {
   }
 
   void handle_get(const Request &request, const Response &response) {
-    std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
     if (request.path == "/") {
@@ -221,11 +219,12 @@ class Server {
   }
 
   std::string handle_request(const Request &request) {
+    Response response;
+
     if (!allowed_method(request)) {
-      return "HTTP/1.1 404 Not Found\r\n\r\n";
+      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
-    Response response;
     // std::string response;
     if (request.method == "POST") {
       handle_post(request, response);
