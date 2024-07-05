@@ -216,17 +216,6 @@ class Server {
     }
   }
 
-  std::string gzip(const std::string &body) {
-    std::stringstream compressed;
-    std::stringstream uncompressed(body);
-    boost::iostreams::filtering_ostream out;
-    out.push(boost::iostreams::gzip_compressor());
-    out.push(compressed);
-    boost::iostreams::copy(uncompressed, out);
-    out.flush();
-    return compressed.str();
-  }
-
   std::string handle_request(const Request &request) {
     Response response;
 
