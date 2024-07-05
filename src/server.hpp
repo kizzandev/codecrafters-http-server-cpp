@@ -150,6 +150,8 @@ class Server {
         response = "HTTP/1.1 201 Created\r\n\r\n";
         file << request.body;
       }
+    } else {
+      response = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
     return response;
@@ -192,7 +194,7 @@ class Server {
         response += "Content-Type: text/plain\r\n";
         response += "Content-Length: 0\r\n\r\n";
       }
-    } else if (paths[1] == "files" && request.method == "GET") {
+    } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
         response = "HTTP/1.1 404 Not Found\r\n\r\n";
         return response;
@@ -214,6 +216,8 @@ class Server {
                          std::istreambuf_iterator<char>());
         response += body;
       }
+    } else {
+      response = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
     return response;
