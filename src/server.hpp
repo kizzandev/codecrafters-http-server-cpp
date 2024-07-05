@@ -206,57 +206,60 @@ class Server {
       if (!file.is_open()) {
         response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
       } else {
-        response.status = "HTTP/1.1 200 OK\r\n";
-        response.headers = "Content-Type: application/octet-stream\r\n";
-        response.headers += "Content-Length: ";
-        response.headers += std::to_string(file.tellg());
-        response.headers += "\r\n\r\n";
         file.seekg(0, std::ios::beg);
         std::string body((std::istreambuf_iterator<char>(file)),
                          std::istreambuf_iterator<char>());
-        response.body = body;
+        response = {.status = "HTTP/1.1 200 OK\r\n",
+                    .headers = "Content-Type: application/octet-stream\r\n",
+                    .headers += "Content-Length: ",
+                    .headers += std::to_string(body.size()),
+                    .headers += "\r\n\r\n",
+                    .body = body};
       }
-    } else {
-      response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
   }
+  else {
+    response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
+  }
+}
 
-  std::string handle_request(const Request &request) {
-    Response response;
+std::string
+handle_request(const Request &request) {
+  Response response;
 
-    if (!allowed_method(request)) {
-      response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
-    }
+  if (!allowed_method(request)) {
+    response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
+  }
 
-    // std::string response;
-    if (request.method == "POST") {
-      handle_post(request, response);
-    } else if (request.method == "GET") {
-      handle_get(request, response);
-    } else {
-      response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
-    }
+  // std::string response;
+  if (request.method == "POST") {
+    handle_post(request, response);
+  } else if (request.method == "GET") {
+    handle_get(request, response);
+  } else {
+    response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
+  }
 
-    /*if (request.headers.size() > 0) {
-      for (const std::string &header : request.headers) {
-        if (header.find("Content-Encoding:") != std::string::npos) {
-          response.body = compress(response.body);
-          if (std::find(response.headers.begin(), response.headers.end(),
-                        "Content-Length:") != response.headers.end()) {
-            response.headers.erase(
-                std::remove(response.headers.begin(), response.headers.end(),
-                            "Content-Length:"),
-                response.headers.end());
-            response.headers.push_back("Content-Length: " +
-                                       std::to_string(response.body.size()));
-          }
-          break;
+  /*if (request.headers.size() > 0) {
+    for (const std::string &header : request.headers) {
+      if (header.find("Content-Encoding:") != std::string::npos) {
+        response.body = compress(response.body);
+        if (std::find(response.headers.begin(), response.headers.end(),
+                      "Content-Length:") != response.headers.end()) {
+          response.headers.erase(
+              std::remove(response.headers.begin(), response.headers.end(),
+                          "Content-Length:"),
+              response.headers.end());
+          response.headers.push_back("Content-Length: " +
+                                     std::to_string(response.body.size()));
         }
+        break;
       }
-    }*/
+    }
+  }*/
 
-    std::string response_str =
-        response.status + response.headers + response.body;
-    return response_str;
-  }
-};
+  std::string response_str = response.status + response.headers + response.body;
+  return response_str;
+}
+}
+;
