@@ -106,12 +106,12 @@ class Server {
   std::string compress_gzip(const std::string &body) {
     std::cout << "SIZE BEFORE COMPRESSION WITH GZIP: " << body.size()
               << std::endl;
-    std::stringstream ss;
-    ss << std::hex << body.size();
-    ss << "\r\n";
-    ss << body;
-    ss << "\r\n";
-    std::string compressed = ss.str();
+    std::stringstream compressed;
+    compressed << std::hex << std::setfill('0');
+    for (char c : body) {
+      compressed << std::setw(2) << static_cast<int>(c);
+    }
+    compressed << std::dec << std::setfill(' ');
     std::cout << "SIZE AFTER COMPRESSION WITH GZIP: " << compressed.size()
               << std::endl;
     return compressed;
