@@ -249,9 +249,9 @@ class Server {
 
         response.headers += "Content-Encoding: gzip\r\n";
         // use zlib
-        std::string gzip_body = gzip(response.body);
+        std::string gzip_body = std::gzip(response.body);
         response.body = gzip_body;
-            }
+      }
     }
 
     std::string response_str =
