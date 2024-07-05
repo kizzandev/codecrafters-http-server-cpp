@@ -234,7 +234,7 @@ class Server {
       response.status = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
-    if (request.headers.size() > 0) {
+    /*if (request.headers.size() > 0) {
       for (const std::string &header : request.headers) {
         if (header.find("Content-Encoding:") != std::string::npos) {
           response.body = compress(response.body);
@@ -250,7 +250,7 @@ class Server {
           break;
         }
       }
-    }
+    }*/
 
     std::string response_str =
         response.status + response.headers + response.body;
