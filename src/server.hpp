@@ -108,8 +108,6 @@ class Server {
 
   std::string compress_gzip(const std::string &body) {
     try {
-      std::cout << "Size before gzip compression: " << body.size() << std::endl;
-
       z_stream stream{};
       stream.next_in =
           reinterpret_cast<Bytef *>(const_cast<char *>(body.c_str()));
@@ -142,10 +140,7 @@ class Server {
       }
 
       std::string compressed_str = compressed.str();
-      std::cout << "Size after gzip compression: " << compressed_str.size()
-                << std::endl;
       return compressed_str;
-
     } catch (const std::exception &e) {
       std::cerr << "Compression error: " << e.what() << std::endl;
       return body;
