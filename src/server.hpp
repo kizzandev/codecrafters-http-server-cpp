@@ -169,10 +169,8 @@ class Server {
     } else if (paths[1] == "echo") {
       response = {
         .status = "HTTP/1.1 200 OK\r\n",
-        .headers = "Content-Type: text/plain\r\n",
-        .headers += "Content-Length: ",
-        .headers += std::to_string(paths[2].size()),
-        .headers += "\r\n\r\n",
+        .headers = "Content-Type: text/plain\r\nContent-Length: " +
+                   std::to_string(paths[2].size()) + "\r\n\r\n",
         .body = paths[2]
       }
     } else if (paths[1] == "user-agent") {
@@ -181,18 +179,18 @@ class Server {
           std::string agent = split(header, ':')[1].substr(1);
           response = {
             .status = "HTTP/1.1 200 OK\r\n",
-            .headers = "Content-Type: text/plain\r\n",
-            .headers += "Content-Length: ",
-            .headers += std::to_string(agent.size()),
-            .headers += "\r\n\r\n",
+            .headers = "Content-Type: text/plain\r\nContent-Length: " +
+                       std::to_string(agent.size()) + "\r\n\r\n",
             .body = agent
           } break;
         }
       }
       if (response.empty()) {
-        response.status = "HTTP/1.1 200 OK\r\n";
-        response.headers = "Content-Type: text/plain\r\n";
-        response.headers += "Content-Length: 0\r\n\r\n";
+        response = {
+          .status = "HTTP/1.1 200 OK\r\n",
+          .headers = "Content-Type: text/plain\r\nContent-Length: 0\r\n\r\n",
+          .body = request.body
+        }
       }
     } else if (paths[1] == "files") {
       if (m_directory.empty() || paths.size() < 3) {
@@ -209,12 +207,12 @@ class Server {
         file.seekg(0, std::ios::beg);
         std::string body((std::istreambuf_iterator<char>(file)),
                          std::istreambuf_iterator<char>());
-        response = {.status = "HTTP/1.1 200 OK\r\n",
-                    .headers = "Content-Type: application/octet-stream\r\n",
-                    .headers += "Content-Length: ",
-                    .headers += std::to_string(body.size()),
-                    .headers += "\r\n\r\n",
-                    .body = body};
+        response = {
+            .status = "HTTP/1.1 200 OK\r\n",
+            .headers =
+                "Content-Type: application/octet-stream\r\nContent-Length: " +
+                std::to_string(body.size()) + "\r\n\r\n",
+            .body = body};
       }
     } else {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
