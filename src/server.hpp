@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <zlib.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -215,18 +216,6 @@ class Server {
     }
   }
 
-  std::string compress_gzip(const std::string &body) {
-    std::string compressed;
-    int status =
-        compress((Bytef *)compressed.data(), (uLongf *)&compressed.size(),
-                 (Bytef *)body.data(), body.size());
-    if (status != Z_OK) {
-      std::cerr << "compress failed\n";
-      exit(EXIT_FAILURE);
-    }
-    return compressed;
-  }
-
   std::string handle_request(const Request &request) {
     Response response;
 
@@ -253,9 +242,19 @@ class Server {
       }
 
       if (is_gzip) {
-        response.body = compress_gzip(response.body);
-        response.headers = "Content-Encoding: gzip\r\nContent-Length: " +
-                           std::to_string(response.body.size()) + "\r\n\r\n";
+        size_t pos = response.headers.find("Content-Encoding");
+        if (pos != std::string::npos) {
+          response.headers.erase(pos, 17);
+        }
+
+        response.headers += "Content-Encoding: gzip\r\n";
+        std::stringstream compressed;
+        boost::iostreams::filtering_ostream gzip_stream;
+        gzip_stream.push(boost::iostreams::gzip_compressor());
+        gzip_stream.push(compressed);
+        gzip_stream << response.body;
+        gzip_stream.flush();
+        response.body = compressed.str();
       }
     }
 
