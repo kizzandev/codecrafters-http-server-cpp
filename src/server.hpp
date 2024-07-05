@@ -6,7 +6,7 @@
 #include <zlib.h>
 
 #include <algorithm>
-#include <boost/iostreams/filter/gzip.hpp>
+#include <boost>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
