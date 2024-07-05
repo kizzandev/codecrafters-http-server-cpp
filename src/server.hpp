@@ -36,9 +36,7 @@ struct Request {
     req.method = req_line[0];
     req.path = req_line[1];
     req.http_version = req_line[2];
-    for (auto i = 1; i < lines.size() - 1; ++i) {
-      req.headers.push_back(lines[i]);
-    }
+    for (auto i = 1; i < lines.size() - 1; ++i) req.headers.push_back(lines[i]);
 
     req.body = lines[lines.size() - 1].substr(1);  // remove \n
     size_t lastNonZero = req.body.find_last_not_of('\x00');
@@ -135,14 +133,33 @@ class Server {
     send(client_fd, response.c_str(), response.size(), 0);
   }
 
-  std::string handle_request(const Request &request) {
+  std::string handle_post(const Request &request,
+                          const std::vector<std::string> &paths) {
     std::string response;
+    std::vector<std::string> paths = split(request.path, '/');
 
-    if (!allowed_method(request)) {
-      return "HTTP/1.1 404 Not Found\r\n\r\n";
+    if (paths[1] == "files") {
+      if (m_directory.empty() || paths.size() < 3) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        return response;
+      }
+      std::string filename = paths[2];
+      std::ofstream file(m_directory + "/" + filename, std::ios::binary);
+      if (!file.is_open()) {
+        response = "HTTP/1.1 404 Not Found\r\n\r\n";
+      } else {
+        response = "HTTP/1.1 201 Created\r\n\r\n";
+        file << request.body;
+      }
     }
 
+    return response;
+  }
+
+  std::string handle_get(const Request &request) {
+    std::string response;
     std::vector<std::string> paths = split(request.path, '/');
+
     if (request.path == "/") {
       response = "HTTP/1.1 200 OK\r\n\r\n";
     } else if (paths[1] == "echo") {
@@ -198,23 +215,21 @@ class Server {
                          std::istreambuf_iterator<char>());
         response += body;
       }
-    } else if (paths[1] == "files" && request.method == "POST") {
-      if (m_directory.empty() || paths.size() < 3) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
-        return response;
-      }
-      std::string filename = paths[2];
-      std::ofstream file(m_directory + "/" + filename, std::ios::binary);
-      if (!file.is_open()) {
-        response = "HTTP/1.1 404 Not Found\r\n\r\n";
-      } else {
-        response = "HTTP/1.1 201 Created\r\n\r\n";
-        file << request.body;
-      }
-    } else {
-      response = "HTTP/1.1 404 Not Found\r\n\r\n";
     }
 
     return response;
+  }
+
+  std::string handle_request(const Request &request) {
+    if (!allowed_method(request)) {
+      return "HTTP/1.1 404 Not Found\r\n\r\n";
+    }
+
+    if (request.method == "POST")
+      return handle_post(request);
+    else if (request.method == "GET")
+      return handle_get(request);
+    else
+      return "HTTP/1.1 404 Not Found\r\n\r\n";
   }
 };
