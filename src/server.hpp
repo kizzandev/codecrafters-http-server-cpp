@@ -250,8 +250,9 @@ class Server {
             "\r\n\r\n";
       }
     }
-  }
 
-  std::string response_str = response.status + response.headers + response.body;
-  return response_str;
+    std::string response_str =
+        response.status + response.headers + response.body;
+    return response_str;
+  }
 };
