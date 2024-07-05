@@ -3,7 +3,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <zlib.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -85,7 +84,6 @@ class Server {
   std::vector<std::string> m_allowed_methods = {"GET", "POST"};
 
  private:
-  // Allowed methods: GET, POST
   bool allowed_method(const Request &request) {
     for (const std::string &method : m_allowed_methods) {
       if (request.method == method) {
@@ -223,43 +221,12 @@ class Server {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
     }
 
-    // std::string response;
     if (request.method == "POST") {
       handle_post(request, response);
     } else if (request.method == "GET") {
       handle_get(request, response);
     } else {
       response = {.status = "HTTP/1.1 404 Not Found\r\n\r\n"};
-    }
-
-    if (request.headers.size() > 0) {
-      bool is_gzip = false;
-      for (const std::string &header : request.headers) {
-        if (header.find("Accept-Encoding: gzip") != std::string::npos) {
-          is_gzip = true;
-          break;
-        }
-      }
-
-      if (is_gzip) {
-        size_t pos = response.headers.find("Content-Encoding");
-        if (pos != std::string::npos) {
-          response.headers.erase(pos, 17);
-        }
-        /*pos = response.headers.find("Content-Length");
-        if (pos != std::string::npos) {
-          response.headers.erase(pos, 15);
-        }*/
-
-        response.headers += "Content-Encoding: gzip\r\n";
-        // use zlib
-        /*std::string gzip_body = gzip(response.body);
-        response.body = gzip_body;
-
-        response.headers +=
-            "Content-Length: " + std::to_string(response.body.size()) +
-            "\r\n\r\n";*/
-      }
     }
 
     std::string response_str =
