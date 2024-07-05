@@ -39,7 +39,12 @@ struct Request {
     for (auto i = 1; i < lines.size() - 1; ++i) {
       req.headers.push_back(lines[i]);
     }
-    req.body = lines[lines.size() - 1];
+
+    req.body = lines[lines.size() - 1].substr(1);  // remove \n
+    while (req.body.back() == '\x00') {
+      req.body.pop_back();
+    }
+
     return req;
   }
 };
