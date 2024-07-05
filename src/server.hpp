@@ -133,8 +133,7 @@ class Server {
     send(client_fd, response.c_str(), response.size(), 0);
   }
 
-  std::string handle_post(const Request &request,
-                          const std::vector<std::string> &paths) {
+  std::string handle_post(const Request &request) {
     std::string response;
     std::vector<std::string> paths = split(request.path, '/');
 
