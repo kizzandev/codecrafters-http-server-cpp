@@ -48,9 +48,17 @@ struct Request {
 };
 
 struct Response {
-  std::string status = "";
-  std::string headers = "";
-  std::string body = "";
+  std::string status;
+  std::string headers;
+  std::string body;
+
+  // operator to assign each member variable
+  Response &operator=(const Response &other) {
+    status = other.status;
+    headers = other.headers;
+    body = other.body;
+    return *this;
+  }
 };
 
 class Server {
