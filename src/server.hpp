@@ -3,7 +3,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <zlib.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -13,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 std::vector<std::string> split(const std::string &s, const char delim) {
   std::vector<std::string> elems;
